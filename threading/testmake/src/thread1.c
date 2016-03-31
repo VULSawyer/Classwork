@@ -19,7 +19,7 @@ static pthread_cond_t list_data_flush = PTHREAD_COND_INITIALIZER;
 
 /*Add object to list*/
 static void add_to_list(char *word) {
-	word_object *last_object, tmp_object;
+	word_object *last_object, *tmp_object;
 	char *tmp_string;
 	
 	/*Do all memory allocation outside of locking- 
@@ -46,7 +46,7 @@ static void add_to_list(char *word) {
 	/* last object is found so link the tmp object at the tail. 
 	Note the function must be called with list_lock held */
        	}
-	last_object->word = tmp_string;
+	
 	
 	pthread_mutex_unlock(&list_lock);
 	pthread_cond_signal(&list_data_ready);
@@ -67,7 +67,7 @@ static void *print_func(void *arg) {
 	word_object *current_object;
 	fprintf(stderr, "Print thread starting\n");
 
-	while(1) {
+	//while(1) {
 	pthread_mutex_lock(&list_lock);
 	while (list_head == NULL) {
 		pthread_cond_wait(&list_data_ready, &list_lock);
@@ -108,7 +108,7 @@ int main(int argc, char **argv)	{
 	int c;
 	int option_index = 0;
 	int count = -1;
-	pthread _t print_thread;
+	pthread_t print_thread;
 	static struct option long_option[] = {
 		{"count",  required_argument, 0, 'c'},
 		{0,         0,                 0,  0 }
